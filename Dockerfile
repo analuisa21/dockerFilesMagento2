@@ -1,4 +1,4 @@
-FROM php:7.0.25-apache
+FROM php:5.6.32-apache
 
 MAINTAINER "Ricardo Ruiz Cruz"
 
