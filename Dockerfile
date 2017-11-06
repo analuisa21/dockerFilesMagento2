@@ -3,7 +3,7 @@ FROM php:7.0.25-apache
 MAINTAINER "Ricardo Ruiz Cruz"
 
 ENV SERVER_NAME		"localhost"
-ENV WEBSERVER_USER	"nginx"
+ENV WEBSERVER_USER	"www-data"
 ENV MAGENTO_USER	"magento2"
 
 RUN apt-get update
