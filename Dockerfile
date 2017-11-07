@@ -33,4 +33,5 @@ RUN 	curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/loca
 RUN passwd ${MAGENTO_USER} -d
 RUN chown -R ${MAGENTO_USER}:${WEBSERVER_USER} /var/www/html
 RUN chown -R ${MAGENTO_USER}:root /home/$MAGENTO_USER
+RUN su ${MAGENTO_USER}
 EXPOSE 80 443
