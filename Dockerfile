@@ -5,6 +5,7 @@ MAINTAINER "Ricardo Ruiz Cruz"
 ENV SERVER_NAME		"localhost"
 ENV WEBSERVER_USER	"www-data"
 ENV MAGENTO_USER	"magento2"
+ENV CURRENT_USER_UID	"1001"
 
 RUN apt-get update
 RUN apt-get install wget apt-utils tcl build-essential -y
@@ -22,7 +23,7 @@ RUN docker-php-ext-enable xdebug \
     && echo "xdebug.show_local_vars = on" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.cli_color = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && chmod 666 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN useradd -m -d /home/${MAGENTO_USER} -s /bin/bash ${MAGENTO_USER} && usermod -g www-data ${MAGENTO_USER} 
+RUN useradd -u ${CURRENT_USER_UID} -m -d /home/${MAGENTO_USER} -s /bin/bash ${MAGENTO_USER} && usermod -g www-data ${MAGENTO_USER} 
 RUN mkdir /home/$MAGENTO_USER/.ssh
 RUN wget https://www.dotdeb.org/dotdeb.gpg && \
     apt-key add dotdeb.gpg
