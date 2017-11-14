@@ -9,10 +9,14 @@ ENV CURRENT_USER_UID	"1001"
 
 RUN apt-get update
 RUN apt-get install wget apt-utils tcl build-essential -y
+RUN apt-get install libmcrypt-dev libicu-dev libxml2-dev libxslt1-dev libfreetype6-dev \
+    libjpeg62-turbo-dev libpng12-dev git vim openssh-server ocaml expect -y
 ADD extraFiles/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-RUN pecl install xdebug
-RUN docker-php-ext-enable xdebug \
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-configure hash --with-mhash \
+    && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql opcache soap bcmath json iconv
+RUN pecl install xdebug && docker-php-ext-enable xdebug \
 	&& echo "zend_extension=\"/usr/local/lib/php/extensions/no-debug-non-zts-20151012/xdebug.so\"" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.remote_enable = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.remote_connect_back = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
