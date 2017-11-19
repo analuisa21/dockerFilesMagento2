@@ -6,6 +6,7 @@ ENV SERVER_NAME		"localhost"
 ENV WEBSERVER_USER	"www-data"
 ENV MAGENTO_USER	"magento2"
 ENV CURRENT_USER_UID	"1001"
+ENV MAGENTO_GROUP       "2000"
 
 RUN apt-get update
 RUN apt-get install wget apt-utils tcl build-essential -y
@@ -42,5 +43,6 @@ RUN 	curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/loca
 RUN passwd ${MAGENTO_USER} -d
 RUN chown -R ${MAGENTO_USER}:${WEBSERVER_USER} /var/www/html
 RUN chown -R ${MAGENTO_USER}:root /home/$MAGENTO_USER
+RUN groupmod -g ${MAGENTO_GROUP} www-data
 RUN su ${MAGENTO_USER}
 EXPOSE 80 443
