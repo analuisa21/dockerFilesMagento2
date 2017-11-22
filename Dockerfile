@@ -12,8 +12,6 @@ RUN apt-get update
 RUN apt-get install wget apt-utils tcl build-essential -y
 RUN apt-get install libmcrypt-dev libicu-dev libxml2-dev libxslt1-dev libfreetype6-dev \
     libjpeg62-turbo-dev libpng12-dev git vim openssh-server ocaml expect -y
-ADD extraFiles/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure hash --with-mhash \
     && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql opcache soap bcmath json iconv
@@ -33,6 +31,8 @@ RUN mkdir /home/$MAGENTO_USER/.ssh
 RUN wget https://www.dotdeb.org/dotdeb.gpg && \
     apt-key add dotdeb.gpg
 RUN cat /etc/*release*
+ADD extraFiles/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 RUN apt-get install supervisor redis-server nano vim mysql-client -y && apt-get install -y apache2 \
     && a2enmod rewrite \
     && a2enmod proxy \
