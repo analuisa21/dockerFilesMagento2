@@ -32,17 +32,21 @@ RUN wget https://www.dotdeb.org/dotdeb.gpg && \
 RUN cat /etc/*release*
 ADD extraFiles/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-RUN apt-get install supervisor redis-server nano vim mysql-client -y && apt-get install -y apache2 \
+RUN apt-get install  openssh-server supervisor redis-server nano vim mysql-client -y && apt-get install -y apache2 \
     && a2enmod rewrite \
     && a2enmod proxy \
     && a2enmod proxy_fcgi
-RUN service apache2 restart
-RUN service redis-server restart
 RUN 	curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN mkdir /var/run/sshd
+RUN echo 'root:screencast' | chpasswd
+RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
 RUN passwd ${MAGENTO_USER} -d
 RUN chown -R ${MAGENTO_USER}:${WEBSERVER_USER} /var/www/html
 RUN chown -R ${MAGENTO_USER}:root /home/$MAGENTO_USER
 RUN groupmod -g ${MAGENTO_GROUP} www-data
 ADD extraFiles/php.ini /usr/local/etc/php
 RUN su ${MAGENTO_USER}
-EXPOSE 80 443
+EXPOSE 22 80 443
