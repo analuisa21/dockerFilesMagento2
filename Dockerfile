@@ -38,6 +38,8 @@ RUN apt-get install  openssh-server supervisor ant nano vim mysql-client -y && a
     && a2enmod proxy_fcgi
 RUN 	curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN mkdir /var/run/sshd
+RUN rm /etc/apache2/sites-available/000-default.conf
+ADD extraFiles/000-default.conf rm /etc/apache2/sites-available/000-default.conf
 RUN echo 'root:screencast' | chpasswd
 RUN echo 'magento2:123456' | chpasswd
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
