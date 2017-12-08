@@ -32,7 +32,7 @@ RUN wget https://www.dotdeb.org/dotdeb.gpg && \
 RUN cat /etc/*release*
 ADD extraFiles/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-RUN apt-get install  openssh-server supervisor ant nano vim mysql-client -y && apt-get install -y apache2 \
+RUN apt-get install net-tools openssh-server supervisor ant nano vim mysql-client -y && apt-get install -y apache2 \
     && a2enmod rewrite \
     && a2enmod proxy \
     && a2enmod proxy_fcgi
