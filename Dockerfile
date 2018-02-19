@@ -1,11 +1,11 @@
-FROM php:7.0.25-apache
+FROM php:5.6-apache
 
 MAINTAINER "Ricardo Ruiz Cruz"
 
 ENV SERVER_NAME		"localhost"
 ENV WEBSERVER_USER	"www-data"
 ENV MAGENTO_USER	"magento2"
-ENV CURRENT_USER_UID	"1001"
+ENV CURRENT_USER_UID	"1200"
 ENV MAGENTO_GROUP       "2000"
 
 RUN apt-get update
