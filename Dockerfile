@@ -51,5 +51,9 @@ RUN chown -R ${MAGENTO_USER}:${WEBSERVER_USER} /var/www/html
 RUN chown -R ${MAGENTO_USER}:root /home/$MAGENTO_USER
 RUN groupmod -g ${CURRENT_USER_UID} www-data
 ADD extraFiles/php.ini /usr/local/etc/php
+RUN apt-get install build-essential -y
+RUN curl -sL https://deb.nodesource.com/setup_6.x -o nodesource_setup.sh
+RUN chmod +x nodesource_setup.sh && ./nodesource_setup.sh
+RUN apt-get install nodejs npm -y
 RUN su ${MAGENTO_USER}
 EXPOSE 22 80 443
