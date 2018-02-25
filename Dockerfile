@@ -1,21 +1,21 @@
-FROM php:7.0.25-apache
+FROM php:7.0-apache
 
 MAINTAINER "Ricardo Ruiz Cruz"
 
 ENV SERVER_NAME		"localhost"
 ENV WEBSERVER_USER	"www-data"
 ENV MAGENTO_USER	"magento2"
-ENV CURRENT_USER_UID	"1001"
+ENV CURRENT_USER_UID	"501"
 ENV MAGENTO_GROUP       "2000"
 
 RUN apt-get update
 RUN apt-get install wget apt-utils tcl build-essential -y
 RUN apt-get install libmcrypt-dev libicu-dev libxml2-dev libxslt1-dev libfreetype6-dev \
-    libjpeg62-turbo-dev libpng12-dev git vim openssh-server ocaml expect -y
+    libjpeg62-turbo-dev libpng12-dev vim openssh-server ocaml expect -y
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure hash --with-mhash \
     && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql mysqli opcache soap bcmath json iconv
-RUN pecl install xdebug && docker-php-ext-enable xdebug \
+RUN pecl install xdebug-2.5.5 && docker-php-ext-enable xdebug \
     && echo "xdebug.remote_enable = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.remote_connect_back = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.collect_params   = 4" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
@@ -25,14 +25,14 @@ RUN pecl install xdebug && docker-php-ext-enable xdebug \
     && echo "xdebug.show_local_vars = on" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.cli_color = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && chmod 666 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN useradd -u ${CURRENT_USER_UID} -m -d /home/${MAGENTO_USER} -s /bin/bash ${MAGENTO_USER} && usermod -g www-data ${MAGENTO_USER} 
+RUN groupadd magentoGroup -g ${MAGENTO_GROUP} 
+RUN useradd -u ${CURRENT_USER_UID} -g ${MAGENTO_GROUP} -m -d /home/${MAGENTO_USER} -s /bin/bash ${MAGENTO_USER} && usermod -g www-data ${MAGENTO_USER} 
 RUN mkdir /home/$MAGENTO_USER/.ssh
 RUN wget https://www.dotdeb.org/dotdeb.gpg && \
     apt-key add dotdeb.gpg
-RUN cat /etc/*release*
 ADD extraFiles/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-RUN apt-get install net-tools openssh-server supervisor ant nano vim mysql-client -y && apt-get install -y apache2 \
+RUN apt-get install net-tools openssh-server supervisor nano vim mysql-client -y && apt-get install -y apache2 \
     && a2enmod rewrite \
     && a2enmod proxy \
     && a2enmod proxy_fcgi
@@ -49,7 +49,11 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 RUN passwd ${MAGENTO_USER} -d
 RUN chown -R ${MAGENTO_USER}:${WEBSERVER_USER} /var/www/html
 RUN chown -R ${MAGENTO_USER}:root /home/$MAGENTO_USER
-RUN groupmod -g ${MAGENTO_GROUP} www-data
+RUN groupmod -g ${CURRENT_USER_UID} www-data
 ADD extraFiles/php.ini /usr/local/etc/php
+RUN apt-get install build-essential -y
+RUN curl -sL https://deb.nodesource.com/setup_6.x -o nodesource_setup.sh
+RUN chmod +x nodesource_setup.sh && ./nodesource_setup.sh
+RUN apt-get install nodejs -y
 RUN su ${MAGENTO_USER}
 EXPOSE 22 80 443
