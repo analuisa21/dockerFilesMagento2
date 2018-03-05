@@ -1,12 +1,12 @@
-FROM php:5.6-apache
+FROM php:5.5-apache
 
 MAINTAINER "Ricardo Ruiz Cruz"
 
 ENV SERVER_NAME		"localhost"
 ENV WEBSERVER_USER	"www-data"
 ENV MAGENTO_USER	"magento2"
-ENV CURRENT_USER_UID	"1200"
-ENV MAGENTO_GROUP       "2000"
+ENV CURRENT_USER_UID	"502"
+ENV MAGENTO_GROUP       "501"
 
 RUN apt-get update
 RUN apt-get install wget apt-utils tcl build-essential -y
@@ -14,10 +14,12 @@ RUN apt-get install libmcrypt-dev libicu-dev libxml2-dev libxslt1-dev libfreetyp
     libjpeg62-turbo-dev libpng12-dev git vim openssh-server ocaml expect -y
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure hash --with-mhash \
-    && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql mysqli opcache soap bcmath json iconv
+    && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql mysql mysqli opcache soap bcmath json iconv
 RUN pecl install xdebug-2.3.3 && docker-php-ext-enable xdebug \
+    && echo "xdebug.idekey = PHPSTORM" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.remote_host = 192.168.1.110" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.remote_enable = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.remote_connect_back = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.remote_connect_back = 0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.collect_params   = 4" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.collect_vars = on" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.dump_globals = on" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
@@ -54,6 +56,6 @@ ADD extraFiles/php.ini /usr/local/etc/php
 RUN apt-get install build-essential -y
 RUN curl -sL https://deb.nodesource.com/setup_6.x -o nodesource_setup.sh
 RUN chmod +x nodesource_setup.sh && ./nodesource_setup.sh
-RUN apt-get install nodejs npm -y
+RUN apt-get install nodejs -y
 RUN su ${MAGENTO_USER}
 EXPOSE 22 80 443
